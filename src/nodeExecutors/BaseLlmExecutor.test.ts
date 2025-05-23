@@ -16,7 +16,8 @@ vi.mock('../utils/OllamaClient', () => {
 import './BaseLlmExecutor';
 import { OllamaClient as MockOllamaClient } from '../utils/OllamaClient';
 
-const executor = getNodeExecutor('baseLlmNode')!;
+const executor = getNodeExecutor('baseLlmNode');
+if (!executor) throw new Error('BaseLlmNode executor not found');
 
 describe('BaseLlmExecutor with LiteLLM', () => {
   beforeEach(() => {
