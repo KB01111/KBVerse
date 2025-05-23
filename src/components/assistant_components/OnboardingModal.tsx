@@ -148,13 +148,15 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   // Auto-test connection when API type changes
   useEffect(() => {
     if (apiConfig.api_type === 'ollama' && apiConfig.ollama_base_url) {
+  useEffect(() => {
+    if (apiConfig.api_type === 'ollama' && apiConfig.ollama_base_url) {
       testConnection();
     } else if (apiConfig.api_type === 'openai' && apiConfig.openai_base_url) {
       testConnection();
     } else if (apiConfig.api_type === 'litellm' && apiConfig.litellm_base_url) {
       testConnection();
     }
-  }, [apiConfig.api_type]);
+  }, [apiConfig.api_type, apiConfig.ollama_base_url, apiConfig.openai_base_url, apiConfig.litellm_base_url]);
 
   const testConnection = async () => {
     setConnectionStatus('testing');
