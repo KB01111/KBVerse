@@ -273,3 +273,5 @@ Key configuration options:
 - `MAX_CONTEXT_MESSAGES`: 20 messages
 - `MAX_IMAGE_SIZE`: 10MB
 - Model image support configuration in localStorage
+- `litellmUrl`: Base URL for a LiteLLM server when `apiType` is `litellm`
+
