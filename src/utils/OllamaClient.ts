@@ -842,11 +842,15 @@ Your response MUST be a valid JSON object, properly formatted and parsable.`;
 
   async checkConnection(): Promise<boolean> {
     try {
-      // Use the list models endpoint to check connection
-      const response = await fetch(`${this.config.baseUrl}/api/tags`, {
+      // Choose endpoint based on API type
+      const endpoint = this.config.type === 'ollama' ? '/api/tags' : '/models';
+      const response = await fetch(`${this.config.baseUrl}${endpoint}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          ...(this.config.type !== 'ollama' && this.config.apiKey
+            ? { Authorization: `Bearer ${this.config.apiKey}` }
+            : {}),
         },
       });
       return response.ok;
