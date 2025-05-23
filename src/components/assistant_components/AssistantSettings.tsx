@@ -12,7 +12,7 @@ interface ModelConfig {
   name: string;
   supportsImages: boolean;
   digest?: string;
-  apiType?: 'ollama' | 'openai' | 'openrouter';
+  apiType?: 'ollama' | 'openai';
 }
 
 interface AssistantSettingsProps {
@@ -149,7 +149,6 @@ const AssistantSettings: React.FC<AssistantSettingsProps> = ({
             api_type: config.api_type || 'ollama',
             openai_api_key: config.openai_api_key,
             openai_base_url: config.openai_base_url || 'https://api.openai.com/v1',
-            openrouter_api_key: config.openrouter_api_key,
             n8n_base_url: config.n8n_base_url,
             n8n_api_key: config.n8n_api_key
           };
