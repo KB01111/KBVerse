@@ -2,6 +2,7 @@ import { OllamaClient } from './utils/OllamaClient';
 import { Node, Edge } from 'reactflow';
 // Add import for NodeExecutorRegistry
 import { getNodeExecutor } from './nodeExecutors/NodeExecutorRegistry';
+import { db } from './db';
 
 const DEFAULT_LOCALHOST_URL = 'http://localhost:11434';
 const DEFAULT_DOCKER_URL = 'http://host.docker.internal:11434';
@@ -13,6 +14,7 @@ export interface ExecutionPlan {
     type: 'ollama' | 'openai' | 'litellm';
     baseUrl: string;
     apiKey?: string;
+    litellmUrl?: string;
   };
 }
 
@@ -35,6 +37,7 @@ export interface ExecutionContext {
     type: 'ollama' | 'openai' | 'litellm';
     baseUrl: string;
     apiKey?: string;
+    litellmUrl?: string;
   };
 }
 
@@ -67,21 +70,29 @@ async function testOllamaConnection(url: string): Promise<boolean> {
  * If any node of type 'baseLlmNode' has a configured Ollama URL,
  * that URL is used in the plan configuration.
  */
-export function generateExecutionPlan(nodes: Node[], edges: Edge[]): ExecutionPlan {
+
+export async function generateExecutionPlan(nodes: Node[], edges: Edge[]): Promise<ExecutionPlan> {
   // Look for LLM nodes to extract the Ollama base URL
   const llmNodes = nodes.filter((node) => node.type === 'baseLlmNode');
-  
+
   const config: any = {
     baseUrl: DEFAULT_LOCALHOST_URL,
     type: 'ollama'
   };
+
+  let globalConfig: APIConfig | null = null;
+  try {
+    globalConfig = await db.getAPIConfig();
+  } catch (err) {
+    console.warn('Failed to load global API config:', err);
+  }
 
   // For now taking the first LLM node's URL, since we suppport one type of LLM node at a time
   if (llmNodes.length > 0) {
     const nodeConfig = llmNodes[0].data.config;
 
     if (nodeConfig?.apiType == 'ollama') {
-      config.baseUrl = nodeConfig.ollamaUrl || DEFAULT_LOCALHOST_URL;
+      config.baseUrl = nodeConfig.ollamaUrl || globalConfig?.ollama_base_url || DEFAULT_LOCALHOST_URL;
       config.type = 'ollama';
     } else if (nodeConfig?.apiType == 'openai') {
       config.baseUrl = nodeConfig.openaiUrl || DEFAULT_LOCALHOST_URL;
@@ -91,6 +102,7 @@ export function generateExecutionPlan(nodes: Node[], edges: Edge[]): ExecutionPl
       config.baseUrl = nodeConfig.litellmUrl || DEFAULT_LOCALHOST_URL;
       config.type = 'litellm';
       config.apiKey = nodeConfig.apiKey;
+
     }
   }
 
@@ -227,7 +239,8 @@ export async function executeFlow(
   const apiConfig = {
     type: plan.config.type || 'ollama',
     baseUrl: baseUrl,
-    apiKey: plan.config?.apiKey || ''
+    apiKey: plan.config?.apiKey || '',
+    litellmUrl: plan.config?.litellmUrl
   };
 
   // Storage for node outputs.
