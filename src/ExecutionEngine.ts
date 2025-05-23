@@ -83,12 +83,16 @@ export function generateExecutionPlan(nodes: Node[], edges: Edge[]): ExecutionPl
     if (nodeConfig?.apiType == 'ollama') {
       config.baseUrl = nodeConfig.ollamaUrl || DEFAULT_LOCALHOST_URL;
       config.type = 'ollama';
-    } else if (nodeConfig?.apiType == 'openai' || nodeConfig?.apiType == 'litellm') {
+    } else if (nodeConfig?.apiType == 'openai') {
       config.baseUrl = nodeConfig.openaiUrl || DEFAULT_LOCALHOST_URL;
-      config.type = nodeConfig.apiType;
+      config.type = 'openai';
+      config.apiKey = nodeConfig.apiKey;
+    } else if (nodeConfig?.apiType == 'litellm') {
+      config.baseUrl = nodeConfig.litellmUrl || DEFAULT_LOCALHOST_URL;
+      config.type = 'litellm';
       config.apiKey = nodeConfig.apiKey;
     }
-  } 
+  }
 
   return { nodes, edges, config };
 }

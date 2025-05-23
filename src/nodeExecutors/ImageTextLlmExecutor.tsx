@@ -67,6 +67,7 @@ const executeImageTextLlm = async (context: NodeExecutionContext): Promise<strin
     
     const systemPrompt = config.systemPrompt || node.data?.systemPrompt || '';
     const ollamaUrl = config.ollamaUrl || node.data?.ollamaUrl;
+    const litellmUrl = config.litellmUrl || 'http://localhost:4000';
     
     // Determine which API to use (from node config or from global context)
     const useOpenAI = apiConfig?.type === 'openai' || apiConfig?.type === 'litellm' || config.apiType === 'openai' || config.apiType === 'litellm';
@@ -86,9 +87,13 @@ const executeImageTextLlm = async (context: NodeExecutionContext): Promise<strin
     // If no client provided or we need to override the API type
     if (!client || (useOpenAI && client.getConfig().type !== 'openai')) {
       if (useOpenAI) {
-        // Use OpenAI configuration
+        // Use OpenAI or LiteLLM configuration
+        const baseUrl =
+          apiConfig?.type === 'litellm' || config.apiType === 'litellm'
+            ? apiConfig?.baseUrl || litellmUrl
+            : apiConfig?.baseUrl || config.openaiUrl || 'https://api.openai.com/v1';
         client = new OllamaClient(
-          apiConfig?.baseUrl || config.openaiUrl || 'https://api.openai.com/v1', 
+          baseUrl,
           {
             apiKey: apiConfig?.apiKey || config.apiKey || '',
             type: 'openai'

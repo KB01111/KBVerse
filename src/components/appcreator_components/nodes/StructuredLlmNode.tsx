@@ -21,6 +21,7 @@ const StructuredLLMNode: React.FC<{ data: any; isConnectable: boolean }> = ({ da
   const [formatError, setFormatError] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [customUrl, setCustomUrl] = useState(data.config.ollamaUrl || '');
+  const [litellmUrl, setLitellmUrl] = useState(data.config.litellmUrl || '');
   
   // Models lists and loading state
   const [nodeModels, setNodeModels] = useState<any[]>([]);
@@ -74,11 +75,20 @@ const StructuredLLMNode: React.FC<{ data: any; isConnectable: boolean }> = ({ da
           setOpenaiUrl(config.openai_base_url);
           data.config.openaiUrl = config.openai_base_url;
         }
+
+        if (config?.litellm_base_url && !data.config.litellmUrl) {
+          setLitellmUrl(config.litellm_base_url);
+          data.config.litellmUrl = config.litellm_base_url;
+        }
       } catch (error) {
         console.error("Failed to load API configuration:", error);
         if (!data.config.ollamaUrl) {
           data.config.ollamaUrl = baseUrl || 'http://localhost:11434';
           setCustomUrl(baseUrl || 'http://localhost:11434');
+        }
+        if (!data.config.litellmUrl) {
+          data.config.litellmUrl = 'http://localhost:4000';
+          setLitellmUrl('http://localhost:4000');
         }
       }
     };
@@ -109,10 +119,11 @@ const StructuredLLMNode: React.FC<{ data: any; isConnectable: boolean }> = ({ da
           }
         }
       } else {
-        // For OpenAI, use the client to fetch models if API key is provided
-        if (openaiApiKey) {
+        // For OpenAI/LiteLLM, use the client to fetch models if API key is provided
+        if (openaiApiKey || apiType === 'litellm') {
           try {
-            const client = new OllamaClient(openaiUrl, {
+            const baseUrl = apiType === 'litellm' ? (litellmUrl || 'http://localhost:4000') : openaiUrl;
+            const client = new OllamaClient(baseUrl, {
               apiKey: openaiApiKey,
               type: 'openai'
             });
@@ -140,7 +151,7 @@ const StructuredLLMNode: React.FC<{ data: any; isConnectable: boolean }> = ({ da
   // Fetch models when apiType or URLs change
   useEffect(() => {
     fetchModels();
-  }, [apiType, customUrl, openaiUrl, openaiApiKey]);
+  }, [apiType, customUrl, openaiUrl, litellmUrl, openaiApiKey]);
   
   // Update config when apiType changes
   useEffect(() => {
@@ -249,6 +260,12 @@ const StructuredLLMNode: React.FC<{ data: any; isConnectable: boolean }> = ({ da
     data.config.openaiUrl = e.target.value;
   };
 
+  const handleLitellmUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    setLitellmUrl(e.target.value);
+    data.config.litellmUrl = e.target.value;
+  };
+
   const handleSettingsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setShowSettings(!showSettings);
@@ -342,7 +359,7 @@ const StructuredLLMNode: React.FC<{ data: any; isConnectable: boolean }> = ({ da
                 </button>
               </div>
             </>
-          ) : (
+          ) : apiType === 'openai' ? (
             <>
               <label className={`block text-xs mb-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                 OpenAI API Key
@@ -384,13 +401,40 @@ const StructuredLLMNode: React.FC<{ data: any; isConnectable: boolean }> = ({ da
                 </button>
               </div>
             </>
+          ) : (
+            <>
+              <label className={`block text-xs mb-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                LiteLLM API URL
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={litellmUrl}
+                  onChange={handleLitellmUrlChange}
+                  onClick={stopPropagation}
+                  onMouseDown={stopPropagation}
+                  onKeyDown={stopPropagation}
+                  onFocus={stopPropagation}
+                  placeholder="http://localhost:4000"
+                  className={`w-full p-2 rounded border ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} text-xs`}
+                />
+                <button
+                  onClick={handleRefreshClick}
+                  onMouseDown={stopPropagation}
+                  className="p-1 bg-blue-500 hover:bg-blue-600 text-white rounded"
+                  disabled={nodeLoading}
+                >
+                  <RefreshCw size={16} className={nodeLoading ? 'animate-spin' : ''} />
+                </button>
+              </div>
+            </>
           )}
         </div>
       )}
       
       <div className="mb-2" onClick={stopPropagation} onMouseDown={stopPropagation}>
         <label className={`block text-xs mb-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-          Select {apiType === 'ollama' ? 'LLM' : 'OpenAI'} Model
+          Select {apiType === 'ollama' ? 'LLM' : apiType === 'litellm' ? 'LiteLLM' : 'OpenAI'} Model
         </label>
         <div className="flex items-center gap-2">
           {apiType === 'ollama' ? (

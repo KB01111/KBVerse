@@ -103,6 +103,7 @@ const executeStructuredLLM = async (context: NodeExecutionContext): Promise<stri
     const model = config.model || 'llama2';
     const systemPrompt = config.prompt || '';
     const ollamaUrl = config.ollamaUrl || 'http://localhost:11434';
+    const litellmUrl = config.litellmUrl || 'http://localhost:4000';
     
     // Determine which API to use (from node config or from global context)
     const useOpenAI = apiConfig?.type === 'openai' || apiConfig?.type === 'litellm' || config.apiType === 'openai' || config.apiType === 'litellm';
@@ -139,7 +140,10 @@ const executeStructuredLLM = async (context: NodeExecutionContext): Promise<stri
     if (useOpenAI) {
       // Use OpenAI SDK with dangerouslyAllowBrowser flag
       const openaiApiKey = apiConfig?.apiKey || config.apiKey || '';
-      const openaiBaseUrl = apiConfig?.baseUrl || config.openaiUrl || undefined; // Use default if not provided
+      const openaiBaseUrl =
+        apiConfig?.type === 'litellm' || config.apiType === 'litellm'
+          ? apiConfig?.baseUrl || litellmUrl
+          : apiConfig?.baseUrl || config.openaiUrl || undefined; // Use default if not provided
       
       const openai = new OpenAI({
         apiKey: openaiApiKey,
