@@ -7,7 +7,7 @@ export interface NodeExecutionContext {
   inputs: { [key: string]: any };
   ollamaClient: OllamaClient;
   apiConfig: {
-    type: 'ollama' | 'openai';
+    type: 'ollama' | 'openai' | 'litellm';
     baseUrl: string;
     apiKey?: string;
   };
