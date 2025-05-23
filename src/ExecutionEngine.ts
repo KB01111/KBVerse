@@ -94,18 +94,15 @@ export async function generateExecutionPlan(nodes: Node[], edges: Edge[]): Promi
     if (nodeConfig?.apiType == 'ollama') {
       config.baseUrl = nodeConfig.ollamaUrl || globalConfig?.ollama_base_url || DEFAULT_LOCALHOST_URL;
       config.type = 'ollama';
-    } else if (nodeConfig?.apiType == 'openai' || nodeConfig?.apiType == 'litellm') {
-      if (nodeConfig.apiType == 'openai') {
-        config.baseUrl = nodeConfig.openaiUrl || globalConfig?.openai_base_url || DEFAULT_LOCALHOST_URL;
-        config.type = 'openai';
-        config.apiKey = nodeConfig.apiKey || globalConfig?.openai_api_key;
-      } else {
-        const litellmUrl = nodeConfig.litellmUrl || globalConfig?.litellm_base_url || DEFAULT_LOCALHOST_URL;
-        config.baseUrl = litellmUrl;
-        config.litellmUrl = litellmUrl;
-        config.type = 'litellm';
-        config.apiKey = nodeConfig.apiKey || globalConfig?.openai_api_key;
-      }
+    } else if (nodeConfig?.apiType == 'openai') {
+      config.baseUrl = nodeConfig.openaiUrl || DEFAULT_LOCALHOST_URL;
+      config.type = 'openai';
+      config.apiKey = nodeConfig.apiKey;
+    } else if (nodeConfig?.apiType == 'litellm') {
+      config.baseUrl = nodeConfig.litellmUrl || DEFAULT_LOCALHOST_URL;
+      config.type = 'litellm';
+      config.apiKey = nodeConfig.apiKey;
+
     }
   }
 
