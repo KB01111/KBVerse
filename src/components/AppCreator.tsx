@@ -390,7 +390,7 @@ const AppCreator: React.FC<AppCreatorProps> = ({ onPageChange, appId }) => {
     setIsExecuting(true);
     setNodeStatuses({});  // Reset node statuses
     try {
-      const plan = generateExecutionPlan(nodes, edges);
+      const plan = await generateExecutionPlan(nodes, edges);
       const updateNodeOutput = (nodeId: string, output: any) => {
         setNodes((nds) =>
           nds.map((node) => {
@@ -485,8 +485,8 @@ const AppCreator: React.FC<AppCreatorProps> = ({ onPageChange, appId }) => {
     [nodes]
   );
 
-  const handleDebug = () => {
-    const plan = generateExecutionPlan(nodes, edges);
+  const handleDebug = async () => {
+    const plan = await generateExecutionPlan(nodes, edges);
     setExecutionJson(plan);
     setDebugOpen(true);
   };

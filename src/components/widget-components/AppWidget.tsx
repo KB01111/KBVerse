@@ -102,7 +102,7 @@ const AppWidget: React.FC<AppWidgetProps> = ({
       await appStore.tempUpdateAppNodes(appId, appDataClone.nodes);
 
       // Generate and execute flow
-      const plan = generateExecutionPlan(appDataClone.nodes, appDataClone.edges);
+      const plan = await generateExecutionPlan(appDataClone.nodes, appDataClone.edges);
 
       // Callback to capture node outputs
       const updateNodeOutput = (nodeId: string, output: any) => {
