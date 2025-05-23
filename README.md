@@ -179,6 +179,14 @@ npm run build              # Web
 npm run electron:build     # Desktop
 ```
 
+## ⚡ LiteLLM Support
+
+Clara can talk to a [LiteLLM](https://github.com/BerriAI/litellm) server in place
+of OpenAI. Run a LiteLLM instance and open **Settings → LLM Provider** to select
+"LiteLLM" as the API type. The **Base URL** field points to your LiteLLM server
+and defaults to `http://localhost:4000`. Update this field in the UI if your
+LiteLLM endpoint runs elsewhere.
+
 ---
 
 ## 📈 GitHub Star Growth
