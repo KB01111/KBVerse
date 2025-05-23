@@ -34,7 +34,7 @@ export class AssistantOllamaClient extends OllamaClient {
     // Use vision model if configured, otherwise fall back to default
     const model = this.modelConfig.visionModel || defaultModel;
 
-    if (this.getConfig().type === 'openai') {
+    if (this.getConfig().type === 'openai' || this.getConfig().type === 'litellm') {
       // Format messages for OpenAI's vision API
       const messages = [{
         role: 'user',
@@ -85,7 +85,7 @@ export class AssistantOllamaClient extends OllamaClient {
     // Use vision model if configured, otherwise fall back to default
     const model = this.modelConfig.visionModel || defaultModel;
     
-    if (this.getConfig().type === 'openai') {
+    if (this.getConfig().type === 'openai' || this.getConfig().type === 'litellm') {
       // Format messages for OpenAI's vision API
       const messages = [{
         role: 'user',
