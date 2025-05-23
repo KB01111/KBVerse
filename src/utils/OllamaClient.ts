@@ -17,7 +17,7 @@ export interface RequestOptions {
 export interface OpenAIConfig {
   apiKey: string;
   baseUrl: string;
-  type: 'ollama' | 'openai';
+  type: 'ollama' | 'openai' | 'litellm';
 }
 
 interface APIResponse {
@@ -108,7 +108,7 @@ export class OllamaClient {
       'Content-Type': 'application/json'
     };
 
-    if (this.config.type === 'openai' && this.config.apiKey) {
+    if (this.config.type !== 'ollama' && this.config.apiKey) {
       headers['Authorization'] = `Bearer ${this.config.apiKey}`;
     }
 
@@ -144,7 +144,7 @@ export class OllamaClient {
         'Content-Type': 'application/json'
       };
       
-      if (this.config.type === 'openai' && this.config.apiKey) {
+      if (this.config.type !== 'ollama' && this.config.apiKey) {
         headers['Authorization'] = `Bearer ${this.config.apiKey}`;
       }
       
@@ -880,7 +880,7 @@ Your response MUST be a valid JSON object, properly formatted and parsable.`;
   }
 
   private formatTool(tool: BaseTool): OpenAITool | OllamaTool {
-    if (this.config.type === 'openai') {
+    if (this.config.type !== 'ollama') {
       return {
         type: 'function',
         ...tool
@@ -911,7 +911,7 @@ Your response MUST be a valid JSON object, properly formatted and parsable.`;
 
   // Add a new method specifically for tool calls that preserves OpenAI response format
   async sendChatWithToolsPreserveFormat(model: string, messages: ChatMessage[], options?: any, tools?: any[]) {
-    if (this.config.type === 'openai') {
+    if (this.config.type !== 'ollama') {
       // Implement OpenAI-specific request that returns the raw response
       return this.sendOpenAIRequest(model, messages, options, tools);
     } else {

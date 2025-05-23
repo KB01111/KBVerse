@@ -3,7 +3,7 @@ import { Settings, Server, ExternalLink } from 'lucide-react';
 import { db } from '../../../db';
 
 interface ApiTypeSelectorProps {
-  onApiTypeChange: (apiType: 'ollama' | 'openai') => void;
+  onApiTypeChange: (apiType: 'ollama' | 'openai' | 'litellm') => void;
   currentApiType: string;
   onPageChange: (page: string) => void;
 }
@@ -19,11 +19,13 @@ const ApiTypeSelector: React.FC<ApiTypeSelectorProps> = ({
     ollama_base_url?: string;
     openai_base_url?: string;
     openai_api_key?: string;
+    litellm_base_url?: string;
   }>({
     api_type: currentApiType,
     ollama_base_url: '',
     openai_base_url: '',
-    openai_api_key: ''
+    openai_api_key: '',
+    litellm_base_url: ''
   });
 
   useEffect(() => {
@@ -36,7 +38,8 @@ const ApiTypeSelector: React.FC<ApiTypeSelectorProps> = ({
             api_type: config.api_type || 'ollama',
             ollama_base_url: config.ollama_base_url || '',
             openai_base_url: config.openai_base_url || '',
-            openai_api_key: config.openai_api_key || ''
+            openai_api_key: config.openai_api_key || '',
+            litellm_base_url: config.litellm_base_url || ''
           });
         }
       } catch (error) {
@@ -51,7 +54,7 @@ const ApiTypeSelector: React.FC<ApiTypeSelectorProps> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleSelectApiType = async (type: 'ollama' | 'openai') => {
+  const handleSelectApiType = async (type: 'ollama' | 'openai' | 'litellm') => {
     try {
       // Update local state
       setApiConfig(prev => ({ ...prev, api_type: type }));
@@ -88,7 +91,7 @@ const ApiTypeSelector: React.FC<ApiTypeSelectorProps> = ({
         title="API Settings"
       >
         <Settings className="w-3.5 h-3.5" />
-        <span>API: {currentApiType === 'openai' ? 'OpenAI' : 'Ollama'}</span>
+        <span>API: {currentApiType === 'openai' ? 'OpenAI' : currentApiType === 'litellm' ? 'LiteLLM' : 'Ollama'}</span>
       </button>
 
       {isOpen && (
@@ -119,6 +122,18 @@ const ApiTypeSelector: React.FC<ApiTypeSelectorProps> = ({
               >
                 <ExternalLink className="w-3.5 h-3.5 mr-2" />
                 <span>OpenAI API</span>
+              </button>
+
+              <button
+                onClick={() => handleSelectApiType('litellm')}
+                className={`flex items-center w-full px-3 py-2 text-xs rounded-md transition-colors ${
+                  currentApiType === 'litellm'
+                    ? 'bg-sakura-100 dark:bg-sakura-900/30 text-sakura-800 dark:text-sakura-300'
+                    : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                }`}
+              >
+                <ExternalLink className="w-3.5 h-3.5 mr-2" />
+                <span>LiteLLM</span>
               </button>
             </div>
             

@@ -21,7 +21,7 @@ const ImageTextLlmNode: React.FC<any> = ({ data, isConnectable }) => {
   const [customUrl, setCustomUrl] = useState(data.config?.ollamaUrl || '');
 
   // API selection and models
-  const [apiType, setApiType] = useState<'ollama' | 'openai'>(data.config?.apiType || 'ollama');
+  const [apiType, setApiType] = useState<'ollama' | 'openai' | 'litellm'>(data.config?.apiType || 'ollama');
   const [openaiApiKey, setOpenaiApiKey] = useState(data.config?.apiKey || '');
   const [openaiUrl, setOpenaiUrl] = useState(data.config?.openaiUrl || 'https://api.openai.com/v1');
 
@@ -50,7 +50,7 @@ const ImageTextLlmNode: React.FC<any> = ({ data, isConnectable }) => {
         
         // Set API type from global config if available
         if (config?.api_type && !data.config.apiType) {
-          setApiType(config.api_type as 'ollama' | 'openai');
+          setApiType(config.api_type as 'ollama' | 'openai' | 'litellm');
           data.config.apiType = config.api_type;
         }
         
@@ -201,7 +201,7 @@ const ImageTextLlmNode: React.FC<any> = ({ data, isConnectable }) => {
 
   const handleApiTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.stopPropagation();
-    setApiType(e.target.value as 'ollama' | 'openai');
+    setApiType(e.target.value as 'ollama' | 'openai' | 'litellm');
     data.config.apiType = e.target.value;
   };
   
@@ -280,6 +280,7 @@ const ImageTextLlmNode: React.FC<any> = ({ data, isConnectable }) => {
         >
           <option value="ollama">Ollama</option>
           <option value="openai">OpenAI</option>
+          <option value="litellm">LiteLLM</option>
         </select>
       </div>
       
@@ -467,7 +468,7 @@ const ImageTextLlmNode: React.FC<any> = ({ data, isConnectable }) => {
       {/* API provider info */}
       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-3">
         <Database size={12} />
-        <span>Using {apiType === 'ollama' ? 'Ollama' : 'OpenAI'} API</span>
+        <span>Using {apiType === 'ollama' ? 'Ollama' : apiType === 'litellm' ? 'LiteLLM' : 'OpenAI'} API</span>
       </div>
       
       <div className="mb-3 p-2 bg-blue-50 dark:bg-blue-900/30 rounded">

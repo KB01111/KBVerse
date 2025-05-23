@@ -26,7 +26,7 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
   const [nodeError, setNodeError] = useState<string | null>(null);
 
   // API selection settings
-  const [apiType, setApiType] = useState<'ollama' | 'openai'>(data.config.apiType || 'ollama');
+  const [apiType, setApiType] = useState<'ollama' | 'openai' | 'litellm'>(data.config.apiType || 'ollama');
   const [openaiApiKey, setOpenaiApiKey] = useState(data.config.apiKey || '');
   const [openaiUrl, setOpenaiUrl] = useState(data.config.openaiUrl || 'https://api.openai.com/v1');
   const [openaiModels, setOpenaiModels] = useState<string[]>([
@@ -43,7 +43,7 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
         
         // Set API type from global config if available
         if (config?.api_type && !data.config.apiType) {
-          setApiType(config.api_type as 'ollama' | 'openai');
+          setApiType(config.api_type as 'ollama' | 'openai' | 'litellm');
           data.config.apiType = config.api_type;
         }
         
@@ -133,7 +133,7 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
         }
         
         // If no model selected, set default
-        if (!model || (apiType === 'openai' && !openaiModels.includes(model))) {
+        if (!model || (apiType !== 'ollama' && !openaiModels.includes(model))) {
           const defaultModel = openaiModels[0] || 'gpt-3.5-turbo';
           setModel(defaultModel);
           data.config.model = defaultModel;
@@ -176,7 +176,7 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
 
   const handleApiTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.stopPropagation();
-    setApiType(e.target.value as 'ollama' | 'openai');
+    setApiType(e.target.value as 'ollama' | 'openai' | 'litellm');
     data.config.apiType = e.target.value;
   };
   
@@ -247,6 +247,7 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
         >
           <option value="ollama">Ollama</option>
           <option value="openai">OpenAI</option>
+          <option value="litellm">LiteLLM</option>
         </select>
       </div>
       
@@ -353,8 +354,8 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
             ) : (
               apiType === 'ollama' ? (
                 displayedModels.map((m: any) => (
-                  <option 
-                    key={m.name} 
+                  <option
+                    key={m.name}
                     value={m.name}
                   >
                     {m.name} ({Math.round(m.size / 1024 / 1024 / 1024)}GB)
@@ -407,7 +408,7 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
       {/* API provider info */}
       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-2">
         <Database size={12} />
-        <span>Using {apiType === 'ollama' ? 'Ollama' : 'OpenAI'} API</span>
+        <span>Using {apiType === 'ollama' ? 'Ollama' : apiType === 'litellm' ? 'LiteLLM' : 'OpenAI'} API</span>
       </div>
       
       <Handle

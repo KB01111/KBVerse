@@ -12,7 +12,7 @@ interface ModelConfig {
   name: string;
   supportsImages: boolean;
   digest?: string;
-  apiType?: 'ollama' | 'openai' | 'openrouter';
+  apiType?: 'ollama' | 'openai' | 'litellm';
 }
 
 interface AssistantSettingsProps {
@@ -35,7 +35,7 @@ const AssistantSettings: React.FC<AssistantSettingsProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPullModal, setShowPullModal] = useState(false);
-  const [apiType, setApiType] = useState<'ollama' | 'openai'>('ollama');
+  const [apiType, setApiType] = useState<'ollama' | 'openai' | 'litellm'>('ollama');
   const [systemPrompt, setSystemPrompt] = useState<string>('');
   const [isSavingPrompt, setIsSavingPrompt] = useState(false);
   const [isUsingDefault, setIsUsingDefault] = useState(true);
@@ -60,10 +60,10 @@ const AssistantSettings: React.FC<AssistantSettingsProps> = ({
         : 'openai' as const;
 
       const client = new OllamaClient(
-        apiType === 'ollama' ? config.ollama_base_url : 'https://api.openai.com/v1', 
-        { 
+        apiType === 'ollama' ? config.ollama_base_url : 'https://api.openai.com/v1',
+        {
           type: apiType,
-          apiKey: apiType === 'openai' ? config.openai_api_key : ''
+          apiKey: apiType !== 'ollama' ? config.openai_api_key : ''
         }
       );
 
@@ -146,15 +146,15 @@ const AssistantSettings: React.FC<AssistantSettingsProps> = ({
           const configWithDefaults: APIConfig = {
             ollama_base_url: config.ollama_base_url || 'http://localhost:11434',
             comfyui_base_url: config.comfyui_base_url || '',
-            api_type: config.api_type || 'ollama',
+            api_type: (config.api_type as 'ollama' | 'openai' | 'litellm') || 'ollama',
             openai_api_key: config.openai_api_key,
             openai_base_url: config.openai_base_url || 'https://api.openai.com/v1',
-            openrouter_api_key: config.openrouter_api_key,
+            litellm_base_url: config.litellm_base_url,
             n8n_base_url: config.n8n_base_url,
             n8n_api_key: config.n8n_api_key
           };
           setApiConfig(configWithDefaults);
-          setApiType(configWithDefaults.api_type as 'ollama' | 'openai');
+          setApiType(configWithDefaults.api_type as 'ollama' | 'openai' | 'litellm');
         }
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
@@ -210,7 +210,7 @@ const AssistantSettings: React.FC<AssistantSettingsProps> = ({
     }
   };
 
-  const handleApiTypeChange = async (type: 'ollama' | 'openai') => {
+  const handleApiTypeChange = async (type: 'ollama' | 'openai' | 'litellm') => {
     if (apiConfig) {
       const updatedConfig: APIConfig = {
         ...apiConfig,
@@ -250,6 +250,17 @@ const AssistantSettings: React.FC<AssistantSettingsProps> = ({
       const updatedConfig: APIConfig = {
         ...apiConfig,
         openai_base_url: url || 'https://api.openai.com/v1'
+      };
+      await db.updateAPIConfig(updatedConfig);
+      setApiConfig(updatedConfig);
+    }
+  };
+
+  const handleLitellmBaseUrlChange = async (url: string) => {
+    if (apiConfig) {
+      const updatedConfig: APIConfig = {
+        ...apiConfig,
+        litellm_base_url: url || 'http://localhost:4000'
       };
       await db.updateAPIConfig(updatedConfig);
       setApiConfig(updatedConfig);
@@ -322,7 +333,7 @@ const AssistantSettings: React.FC<AssistantSettingsProps> = ({
             <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
               API Type
             </h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <button
                 onClick={() => handleApiTypeChange('ollama')}
                 className={`flex flex-col items-center p-4 rounded-lg border-2 transition-all ${
@@ -349,6 +360,19 @@ const AssistantSettings: React.FC<AssistantSettingsProps> = ({
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Compatible with OpenAI API format</p>
                 </div>
               </button>
+              <button
+                onClick={() => handleApiTypeChange('litellm')}
+                className={`flex flex-col items-center p-4 rounded-lg border-2 transition-all ${
+                  apiType === 'litellm'
+                    ? 'border-sakura-500 bg-sakura-50 dark:bg-sakura-500/10'
+                    : 'border-gray-200 hover:border-sakura-200 dark:border-gray-700'
+                }`}
+              >
+                <div className="text-center">
+                  <h3 className="font-medium text-gray-900 dark:text-white">LiteLLM</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">OpenAI-compatible proxy</p>
+                </div>
+              </button>
             </div>
             
             {apiType === 'ollama' && (
@@ -366,7 +390,7 @@ const AssistantSettings: React.FC<AssistantSettingsProps> = ({
               </div>
             )}
 
-            {apiType === 'openai' && (
+            {(apiType === 'openai' || apiType === 'litellm') && (
               <div className="mt-4 space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -386,13 +410,13 @@ const AssistantSettings: React.FC<AssistantSettingsProps> = ({
                   </label>
                   <input
                     type="url"
-                    value={apiConfig?.openai_base_url || 'https://api.openai.com/v1'}
-                    onChange={(e) => handleOpenAIBaseUrlChange(e.target.value)}
+                    value={apiType === 'litellm' ? (apiConfig?.litellm_base_url || 'http://localhost:4000') : (apiConfig?.openai_base_url || 'https://api.openai.com/v1')}
+                    onChange={(e) => apiType === 'litellm' ? handleLitellmBaseUrlChange(e.target.value) : handleOpenAIBaseUrlChange(e.target.value)}
                     className="w-full px-4 py-2 rounded-lg bg-white/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-sm"
-                    placeholder="https://api.openai.com/v1"
+                    placeholder={apiType === 'litellm' ? 'http://localhost:4000' : 'https://api.openai.com/v1'}
                   />
                   <p className="mt-1 text-xs text-gray-500">
-                    Default: https://api.openai.com/v1. Change this if you're using a different OpenAI-compatible API endpoint.
+                    Default: {apiType === 'litellm' ? 'http://localhost:4000' : 'https://api.openai.com/v1'}. Change this if you're using a different OpenAI-compatible API endpoint.
                   </p>
                 </div>
               </div>
@@ -481,7 +505,7 @@ const AssistantSettings: React.FC<AssistantSettingsProps> = ({
             {error ? (
               <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-sm text-red-600 dark:text-red-400">
                 {error}
-                {apiType === 'openai' && (
+                {apiType !== 'ollama' && (
                   <div className="mt-2 font-medium">
                     Using OpenAI models. Switch to Ollama in Settings for local models.
                   </div>

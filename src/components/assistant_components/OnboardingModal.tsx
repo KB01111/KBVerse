@@ -17,7 +17,7 @@ interface ModelSelectionConfig extends ModelConfig {
 }
 
 interface APIConfig {
-  api_type: 'ollama' | 'openai';
+  api_type: 'ollama' | 'openai' | 'litellm';
   ollama_base_url: string;
   openai_base_url: string;
   openai_api_key: string;
@@ -117,7 +117,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
           setApiConfig({
             ...defaultApiConfig,  // Start with defaults
             ...savedApiConfig,    // Override with saved values
-            api_type: (savedApiConfig.api_type === 'openai' ? 'openai' : 'ollama') as 'ollama' | 'openai',
+            api_type: (savedApiConfig.api_type === 'openai' ? 'openai' : savedApiConfig.api_type === 'litellm' ? 'litellm' : 'ollama') as 'ollama' | 'openai' | 'litellm',
           });
 
           // Automatically test connection with saved config
