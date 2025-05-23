@@ -25,7 +25,7 @@ const ApiTypeSelector: React.FC<ApiTypeSelectorProps> = ({
     ollama_base_url: '',
     openai_base_url: '',
     openai_api_key: '',
-    litellm_base_url: ''
+    litellm_base_url: 'http://localhost:4000'
   });
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const ApiTypeSelector: React.FC<ApiTypeSelectorProps> = ({
             ollama_base_url: config.ollama_base_url || '',
             openai_base_url: config.openai_base_url || '',
             openai_api_key: config.openai_api_key || '',
-            litellm_base_url: config.litellm_base_url || ''
+            litellm_base_url: config.litellm_base_url || 'http://localhost:4000'
           });
         }
       } catch (error) {
@@ -91,7 +91,14 @@ const ApiTypeSelector: React.FC<ApiTypeSelectorProps> = ({
         title="API Settings"
       >
         <Settings className="w-3.5 h-3.5" />
-        <span>API: {currentApiType === 'openai' ? 'OpenAI' : currentApiType === 'litellm' ? 'LiteLLM' : 'Ollama'}</span>
+        <span>
+          API:
+          {currentApiType === 'openai'
+            ? 'OpenAI'
+            : currentApiType === 'litellm'
+              ? `LiteLLM (${apiConfig.litellm_base_url || 'http://localhost:4000'})`
+              : 'Ollama'}
+        </span>
       </button>
 
       {isOpen && (

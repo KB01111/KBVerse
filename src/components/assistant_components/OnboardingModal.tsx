@@ -20,6 +20,7 @@ interface APIConfig {
   api_type: 'ollama' | 'openai' | 'litellm';
   ollama_base_url: string;
   openai_base_url: string;
+  litellm_base_url: string;
   openai_api_key: string;
   comfyui_base_url: string;
   n8n_base_url?: string;
@@ -83,6 +84,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
     api_type: 'ollama',
     ollama_base_url: 'http://localhost:11434',
     openai_base_url: 'https://api.openai.com/v1',
+    litellm_base_url: 'http://localhost:4000',
     openai_api_key: '',
     comfyui_base_url: 'http://localhost:8188',
     n8n_base_url: '',
@@ -146,11 +148,15 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
   // Auto-test connection when API type changes
   useEffect(() => {
     if (apiConfig.api_type === 'ollama' && apiConfig.ollama_base_url) {
+  useEffect(() => {
+    if (apiConfig.api_type === 'ollama' && apiConfig.ollama_base_url) {
       testConnection();
     } else if (apiConfig.api_type === 'openai' && apiConfig.openai_base_url) {
       testConnection();
+    } else if (apiConfig.api_type === 'litellm' && apiConfig.litellm_base_url) {
+      testConnection();
     }
-  }, [apiConfig.api_type]);
+  }, [apiConfig.api_type, apiConfig.ollama_base_url, apiConfig.openai_base_url, apiConfig.litellm_base_url]);
 
   const testConnection = async () => {
     setConnectionStatus('testing');
@@ -163,8 +169,14 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
       if (apiConfig.api_type === 'ollama') {
         baseUrl = apiConfig.ollama_base_url || 'http://localhost:11434';
         clientConfig = { type: 'ollama' };
-      } else {
+      } else if (apiConfig.api_type === 'openai') {
         baseUrl = apiConfig.openai_base_url || 'https://api.openai.com/v1';
+        clientConfig = {
+          type: 'openai',
+          apiKey: apiConfig.openai_api_key
+        };
+      } else {
+        baseUrl = apiConfig.litellm_base_url || 'http://localhost:4000';
         clientConfig = {
           type: 'openai',
           apiKey: apiConfig.openai_api_key
@@ -855,47 +867,53 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
                   {/* API Configuration */}
                   <div className="mt-8 space-y-4">
-                    {apiConfig.api_type === 'ollama' ? (
+                  {apiConfig.api_type === 'ollama' && (
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-200">
+                        Ollama Base URL
+                      </label>
+                      <input
+                        type="url"
+                        value={apiConfig.ollama_base_url}
+                        onChange={(e) => updateApiConfig({ ollama_base_url: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl appearance-none bg-white/30 dark:bg-gray-900/30 backdrop-blur-sm focus:bg-white/50 dark:focus:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-sakura-500/20 border-0 text-gray-900 dark:text-white shadow-sm transition-all"
+                        placeholder="http://localhost:11434"
+                      />
+                    </div>
+                  )}
+
+                  {(apiConfig.api_type === 'openai' || apiConfig.api_type === 'litellm') && (
+                    <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-200">
-                          Ollama Base URL
+                          Base URL
                         </label>
                         <input
                           type="url"
-                          value={apiConfig.ollama_base_url}
-                          onChange={(e) => updateApiConfig({ ollama_base_url: e.target.value })}
+                          value={apiConfig.api_type === 'litellm' ? apiConfig.litellm_base_url : apiConfig.openai_base_url}
+                          onChange={(e) =>
+                            apiConfig.api_type === 'litellm'
+                              ? updateApiConfig({ litellm_base_url: e.target.value })
+                              : updateApiConfig({ openai_base_url: e.target.value })
+                          }
                           className="w-full px-4 py-3 rounded-xl appearance-none bg-white/30 dark:bg-gray-900/30 backdrop-blur-sm focus:bg-white/50 dark:focus:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-sakura-500/20 border-0 text-gray-900 dark:text-white shadow-sm transition-all"
-                          placeholder="http://localhost:11434"
+                          placeholder={apiConfig.api_type === 'litellm' ? 'http://localhost:4000' : 'https://api.openai.com/v1'}
                         />
                       </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-200">
-                            API Base URL
-                          </label>
-                          <input
-                            type="url"
-                            value={apiConfig.openai_base_url}
-                            onChange={(e) => updateApiConfig({ openai_base_url: e.target.value })}
-                            className="w-full px-4 py-3 rounded-xl appearance-none bg-white/30 dark:bg-gray-900/30 backdrop-blur-sm focus:bg-white/50 dark:focus:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-sakura-500/20 border-0 text-gray-900 dark:text-white shadow-sm transition-all"
-                            placeholder="https://api.openai.com/v1"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-200">
-                            API Key
-                          </label>
-                          <input
-                            type="password"
-                            value={apiConfig.openai_api_key}
-                            onChange={(e) => updateApiConfig({ openai_api_key: e.target.value })}
-                            className="w-full px-4 py-3 rounded-xl appearance-none bg-white/30 dark:bg-gray-900/30 backdrop-blur-sm focus:bg-white/50 dark:focus:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-sakura-500/20 border-0 text-gray-900 dark:text-white shadow-sm transition-all"
-                            placeholder="sk-..."
-                          />
-                        </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-200">
+                          API Key
+                        </label>
+                        <input
+                          type="password"
+                          value={apiConfig.openai_api_key}
+                          onChange={(e) => updateApiConfig({ openai_api_key: e.target.value })}
+                          className="w-full px-4 py-3 rounded-xl appearance-none bg-white/30 dark:bg-gray-900/30 backdrop-blur-sm focus:bg-white/50 dark:focus:bg-gray-900/50 focus:outline-none focus:ring-2 focus:ring-sakura-500/20 border-0 text-gray-900 dark:text-white shadow-sm transition-all"
+                          placeholder="sk-..."
+                        />
                       </div>
-                    )}
+                    </div>
+                  )}
 
                     {/* Connection Test Section */}
                     <div className="mt-6">

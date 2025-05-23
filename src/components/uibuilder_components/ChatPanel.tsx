@@ -195,6 +195,9 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 compact={true}
               />
             )}
+            {apiType === 'litellm' && (
+              <span className="ml-2 text-gray-500">{apiConfig.litellm_base_url}</span>
+            )}
           </div>
         </div>
       </div>
