@@ -26,9 +26,10 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
   const [nodeError, setNodeError] = useState<string | null>(null);
 
   // API selection settings
-  const [apiType, setApiType] = useState<'ollama' | 'openai'>(data.config.apiType || 'ollama');
+  const [apiType, setApiType] = useState<'ollama' | 'openai' | 'litellm'>(data.config.apiType || 'ollama');
   const [openaiApiKey, setOpenaiApiKey] = useState(data.config.apiKey || '');
   const [openaiUrl, setOpenaiUrl] = useState(data.config.openaiUrl || 'https://api.openai.com/v1');
+  const [litellmUrl, setLitellmUrl] = useState(data.config.litellmUrl || 'http://localhost:4000');
   const [openaiModels, setOpenaiModels] = useState<string[]>([
     'gpt-4-turbo',
     'gpt-4',
@@ -43,7 +44,7 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
         
         // Set API type from global config if available
         if (config?.api_type && !data.config.apiType) {
-          setApiType(config.api_type as 'ollama' | 'openai');
+          setApiType(config.api_type as 'ollama' | 'openai' | 'litellm');
           data.config.apiType = config.api_type;
         }
         
@@ -63,6 +64,10 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
         if (config?.openai_base_url && !data.config.openaiUrl) {
           setOpenaiUrl(config.openai_base_url);
           data.config.openaiUrl = config.openai_base_url;
+        }
+        if (config?.litellm_base_url && !data.config.litellmUrl) {
+          setLitellmUrl(config.litellm_base_url);
+          data.config.litellmUrl = config.litellm_base_url;
         }
       } catch (error) {
         console.error("Failed to load API configuration:", error);
@@ -101,17 +106,18 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
           }
         }
       } else {
-        // For OpenAI, use the client to fetch models if API key is provided
+        // For OpenAI/LiteLLM, use the client to fetch models if API key is provided
         if (openaiApiKey) {
           try {
-            const client = new OllamaClient(openaiUrl, {
+            const urlToUse = apiType === 'litellm' ? litellmUrl : openaiUrl;
+            const client = new OllamaClient(urlToUse, {
               apiKey: openaiApiKey,
-              type: 'openai'
+              type: apiType === 'litellm' ? 'litellm' : 'openai'
             });
             const models = await client.listModels();
-            
+
             // Don't filter by name for non-OpenAI endpoints to support LM Studio and similar services
-            const isStandardOpenAI = openaiUrl.includes('api.openai.com');
+            const isStandardOpenAI = urlToUse.includes('api.openai.com');
             const chatModels = models
               .map((m: any) => m.name || m.id)
               .filter((name: string) => {
@@ -133,7 +139,7 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
         }
         
         // If no model selected, set default
-        if (!model || (apiType === 'openai' && !openaiModels.includes(model))) {
+        if (!model || ((apiType === 'openai' || apiType === 'litellm') && !openaiModels.includes(model))) {
           const defaultModel = openaiModels[0] || 'gpt-3.5-turbo';
           setModel(defaultModel);
           data.config.model = defaultModel;
@@ -149,7 +155,7 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
   // Fetch models when apiType or URLs change
   useEffect(() => {
     fetchModels();
-  }, [apiType, customUrl, openaiUrl, openaiApiKey]);
+  }, [apiType, customUrl, openaiUrl, litellmUrl, openaiApiKey]);
   
   // Update config when apiType changes
   useEffect(() => {
@@ -176,7 +182,7 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
 
   const handleApiTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.stopPropagation();
-    setApiType(e.target.value as 'ollama' | 'openai');
+    setApiType(e.target.value as 'ollama' | 'openai' | 'litellm');
     data.config.apiType = e.target.value;
   };
   
@@ -190,6 +196,12 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
     e.stopPropagation();
     setOpenaiUrl(e.target.value);
     data.config.openaiUrl = e.target.value;
+  };
+
+  const handleLitellmUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    setLitellmUrl(e.target.value);
+    data.config.litellmUrl = e.target.value;
   };
 
   const handleSettingsClick = (e: React.MouseEvent) => {
@@ -247,6 +259,7 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
         >
           <option value="ollama">Ollama</option>
           <option value="openai">OpenAI</option>
+          <option value="litellm">LiteLLM</option>
         </select>
       </div>
       
@@ -272,6 +285,35 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
                   } text-xs`}
                 />
                 <button 
+                  onClick={handleRefreshClick}
+                  onMouseDown={stopPropagation}
+                  className="p-1 bg-blue-500 hover:bg-blue-600 text-white rounded"
+                  disabled={nodeLoading}
+                >
+                  <RefreshCw size={16} className={nodeLoading ? 'animate-spin' : ''} />
+                </button>
+              </div>
+            </>
+          ) : apiType === 'litellm' ? (
+            <>
+              <label className={`block text-xs mb-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                LiteLLM Base URL
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={litellmUrl}
+                  onChange={handleLitellmUrlChange}
+                  onClick={stopPropagation}
+                  onMouseDown={stopPropagation}
+                  onKeyDown={stopPropagation}
+                  onFocus={stopPropagation}
+                  placeholder="http://localhost:4000"
+                  className={`w-full p-2 rounded border ${
+                    isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'
+                  } text-xs`}
+                />
+                <button
                   onClick={handleRefreshClick}
                   onMouseDown={stopPropagation}
                   className="p-1 bg-blue-500 hover:bg-blue-600 text-white rounded"
@@ -329,7 +371,7 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
       
       <div className="mb-2" onClick={stopPropagation} onMouseDown={stopPropagation}>
         <label className={`block text-xs mb-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-          Select {apiType === 'ollama' ? 'LLM' : 'OpenAI'} Model
+          Select {apiType === 'ollama' ? 'LLM' : apiType === 'litellm' ? 'LiteLLM' : 'OpenAI'} Model
         </label>
         <div className="flex items-center gap-2">
           <select 
@@ -407,7 +449,7 @@ const BaseLlmNode = ({ data, isConnectable }: any) => {
       {/* API provider info */}
       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-2">
         <Database size={12} />
-        <span>Using {apiType === 'ollama' ? 'Ollama' : 'OpenAI'} API</span>
+        <span>Using {apiType === 'ollama' ? 'Ollama' : apiType === 'litellm' ? 'LiteLLM' : 'OpenAI'} API</span>
       </div>
       
       <Handle
