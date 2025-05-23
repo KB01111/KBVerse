@@ -112,7 +112,7 @@ const Assistant: React.FC<AssistantProps> = ({ onPageChange }) => {
     
     // Default config now sets mode to 'auto'
     return {
-      type: apiType as 'ollama' | 'openai',
+      type: apiType as 'ollama' | 'openai' | 'litellm',
       mode: 'auto',
       visionModel: '',
       toolModel: '',
@@ -539,7 +539,7 @@ const Assistant: React.FC<AssistantProps> = ({ onPageChange }) => {
         } else {
           // If no config exists for this API type, create default and show config modal
           const defaultConfig: ApiModelConfig = {
-            type: config.api_type as 'ollama' | 'openai',
+            type: config.api_type as 'ollama' | 'openai' | 'litellm',
             mode: 'manual',
             visionModel: '',
             toolModel: '',
@@ -600,7 +600,7 @@ const Assistant: React.FC<AssistantProps> = ({ onPageChange }) => {
     const apiType = client?.getConfig().type || 'ollama';
     const fullConfig: ApiModelConfig = {
       ...config,
-      type: apiType as 'ollama' | 'openai'
+      type: apiType as 'ollama' | 'openai' | 'litellm'
     };
 
     setModelSelectionConfig(fullConfig);
@@ -750,7 +750,7 @@ const Assistant: React.FC<AssistantProps> = ({ onPageChange }) => {
     const newConfig: ApiModelConfig = {
       ...modelSelectionConfig,
       mode,
-      type: apiType as 'ollama' | 'openai'
+      type: apiType as 'ollama' | 'openai' | 'litellm'
     };
 
     setModelSelectionConfig(newConfig);

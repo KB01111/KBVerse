@@ -28,7 +28,7 @@ const StructuredLLMNode: React.FC<{ data: any; isConnectable: boolean }> = ({ da
   const [nodeError, setNodeError] = useState<string | null>(null);
 
   // Add OpenAI specific settings
-  const [apiType, setApiType] = useState<'ollama' | 'openai'>(data.config.apiType || 'ollama');
+  const [apiType, setApiType] = useState<'ollama' | 'openai' | 'litellm'>(data.config.apiType || 'ollama');
   const [openaiApiKey, setOpenaiApiKey] = useState(data.config.apiKey || '');
   const [openaiUrl, setOpenaiUrl] = useState(data.config.openaiUrl || 'https://api.openai.com/v1');
   const [openaiModels, setOpenaiModels] = useState<string[]>([
@@ -53,7 +53,7 @@ const StructuredLLMNode: React.FC<{ data: any; isConnectable: boolean }> = ({ da
         const config = await db.getAPIConfig();
         // Set API type from global config if available
         if (config?.api_type && !data.config.apiType) {
-          setApiType(config.api_type as 'ollama' | 'openai');
+          setApiType(config.api_type as 'ollama' | 'openai' | 'litellm');
           data.config.apiType = config.api_type;
         }
         
@@ -124,7 +124,7 @@ const StructuredLLMNode: React.FC<{ data: any; isConnectable: boolean }> = ({ da
         }
         
         // If no model selected, set default
-        if (!model || (apiType === 'openai' && !openaiModels.includes(model))) {
+        if (!model || (apiType !== 'ollama' && !openaiModels.includes(model))) {
           const defaultModel = openaiModels[0] || 'gpt-4-turbo';
           setModel(defaultModel);
           data.config.model = defaultModel;
@@ -227,12 +227,12 @@ const StructuredLLMNode: React.FC<{ data: any; isConnectable: boolean }> = ({ da
 
   const handleApiTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.stopPropagation();
-    const newApiType = e.target.value as 'ollama' | 'openai';
+    const newApiType = e.target.value as 'ollama' | 'openai' | 'litellm';
     setApiType(newApiType);
     data.config.apiType = newApiType;
-    
+
     // Reset custom model input when switching API types
-    if (newApiType === 'openai') {
+    if (newApiType !== 'ollama') {
       setCustomModelInput(model);
     }
   };
@@ -309,6 +309,7 @@ const StructuredLLMNode: React.FC<{ data: any; isConnectable: boolean }> = ({ da
         >
           <option value="ollama">Ollama</option>
           <option value="openai">OpenAI</option>
+          <option value="litellm">LiteLLM</option>
         </select>
       </div>
       
@@ -536,7 +537,7 @@ const StructuredLLMNode: React.FC<{ data: any; isConnectable: boolean }> = ({ da
       {/* API provider info */}
       <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-2">
         <Database size={12} />
-        <span>Using {apiType === 'ollama' ? 'Ollama' : 'OpenAI'} API</span>
+        <span>Using {apiType === 'ollama' ? 'Ollama' : apiType === 'litellm' ? 'LiteLLM' : 'OpenAI'} API</span>
       </div>
       
       <Handle

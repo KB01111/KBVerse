@@ -40,7 +40,7 @@ const Onboarding = ({onComplete}: OnboardingProps) => {
         comfyui_url: 'http://localhost:8188',
         openai_api_key: '',
         openai_base_url: 'https://api.openai.com/v1',
-        api_type: 'ollama' as 'ollama' | 'openai'
+        api_type: 'ollama' as 'ollama' | 'openai' | 'litellm'
     });
     const [loading, setLoading] = useState(false);
     const [pingStatus, setPingStatus] = useState<'idle' | 'success' | 'error'>('idle');

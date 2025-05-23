@@ -12,7 +12,7 @@ interface ChatPanelProps {
   onModeChange: (mode: 'chat' | 'design') => void;
   selectedModel: OllamaModel | OpenAIModel | null;
   onModelSelect: (model: OllamaModel | OpenAIModel) => void;
-  apiType?: 'ollama' | 'openai';
+  apiType?: 'ollama' | 'openai' | 'litellm';
   onRestoreCheckpoint?: (code: { html: string; css: string; js: string; find?: string; replace?: string }) => void;
   isGenerating?: boolean;
   isProcessing?: boolean;
@@ -40,6 +40,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
   const [apiConfig, setApiConfig] = useState<{
     openai_api_key?: string;
     openai_base_url?: string;
+    litellm_base_url?: string;
   }>({});
   const [expandedMessages, setExpandedMessages] = useState<{ [key: number]: boolean }>({});
   const [expandedThink, setExpandedThink] = useState<{ [key: string]: boolean }>({});
@@ -52,7 +53,8 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
       if (config) {
         setApiConfig({
           openai_api_key: config.openai_api_key || '',
-          openai_base_url: config.openai_base_url || 'https://api.openai.com/v1'
+          openai_base_url: config.openai_base_url || 'https://api.openai.com/v1',
+          litellm_base_url: config.litellm_base_url || 'http://localhost:4000'
         });
       }
     };
@@ -189,7 +191,7 @@ const ChatPanel: React.FC<ChatPanelProps> = ({
                 onModelSelect={handleModelSelect as (model: OpenAIModel) => void}
                 selectedModelId={(selectedModel as OpenAIModel)?.id}
                 apiKey={apiConfig.openai_api_key}
-                baseUrl={apiConfig.openai_base_url}
+                baseUrl={apiType === 'litellm' ? apiConfig.litellm_base_url : apiConfig.openai_base_url}
                 compact={true}
               />
             )}

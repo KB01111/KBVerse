@@ -69,7 +69,7 @@ const executeImageTextLlm = async (context: NodeExecutionContext): Promise<strin
     const ollamaUrl = config.ollamaUrl || node.data?.ollamaUrl;
     
     // Determine which API to use (from node config or from global context)
-    const useOpenAI = apiConfig?.type === 'openai' || config.apiType === 'openai';
+    const useOpenAI = apiConfig?.type === 'openai' || apiConfig?.type === 'litellm' || config.apiType === 'openai' || config.apiType === 'litellm';
     
     if (!ollamaUrl && !ollamaClient && !useOpenAI) {
       return "Error: No API URL configured. Please set the URL in the node settings.";

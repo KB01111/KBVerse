@@ -35,7 +35,7 @@ const UIBuilder: React.FC<UIBuilderProps> = ({ onPageChange }) => {
   const [chatMode, setChatMode] = useState<'chat' | 'design'>('design');
   const [selectedOllamaModel, setSelectedOllamaModel] = useState<OllamaModel | null>(null);
   const [selectedOpenAIModel, setSelectedOpenAIModel] = useState<OpenAIModel | null>(null);
-  const [apiType, setApiType] = useState<'ollama' | 'openai'>('ollama');
+  const [apiType, setApiType] = useState<'ollama' | 'openai' | 'litellm'>('ollama');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [apiConfig, setApiConfig] = useState({
@@ -1009,7 +1009,7 @@ Reply ONLY with a JSON object like this:
     localStorage.setItem('openai_ui_builder_selected_model', JSON.stringify(model));
   };
 
-  const handleApiTypeChange = async (type: 'ollama' | 'openai') => {
+  const handleApiTypeChange = async (type: 'ollama' | 'openai' | 'litellm') => {
     console.log('UIBuilder: Changing API type to:', type);
     setApiType(type);
     

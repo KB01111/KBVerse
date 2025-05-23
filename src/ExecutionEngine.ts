@@ -10,7 +10,7 @@ export interface ExecutionPlan {
   nodes: Node[];
   edges: Edge[];
   config: {
-    type: 'ollama' | 'openai';
+    type: 'ollama' | 'openai' | 'litellm';
     baseUrl: string;
     apiKey?: string;
   };
@@ -32,7 +32,7 @@ export interface ExecutionContext {
   updateUi?: (type: string, nodeId: string, data: any) => void;
   updateNodeStatus?: (nodeId: string, status: 'running' | 'completed' | 'error') => void;
   apiConfig: {
-    type: 'ollama' | 'openai';
+    type: 'ollama' | 'openai' | 'litellm';
     baseUrl: string;
     apiKey?: string;
   };
@@ -83,9 +83,9 @@ export function generateExecutionPlan(nodes: Node[], edges: Edge[]): ExecutionPl
     if (nodeConfig?.apiType == 'ollama') {
       config.baseUrl = nodeConfig.ollamaUrl || DEFAULT_LOCALHOST_URL;
       config.type = 'ollama';
-    } else if (nodeConfig?.apiType == 'openai') {
+    } else if (nodeConfig?.apiType == 'openai' || nodeConfig?.apiType == 'litellm') {
       config.baseUrl = nodeConfig.openaiUrl || DEFAULT_LOCALHOST_URL;
-      config.type = 'openai';
+      config.type = nodeConfig.apiType;
       config.apiKey = nodeConfig.apiKey;
     }
   } 

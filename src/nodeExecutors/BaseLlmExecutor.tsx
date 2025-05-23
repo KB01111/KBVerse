@@ -16,7 +16,7 @@ const executeLlmPrompt = async (context: NodeExecutionContext) => {
     const ollamaUrl = config.ollamaUrl || 'http://localhost:11434';
     
     // Determine which API to use (from node config or from global context)
-    const useOpenAI = apiConfig?.type === 'openai' || config.apiType === 'openai';
+    const useOpenAI = apiConfig?.type === 'openai' || apiConfig?.type === 'litellm' || config.apiType === 'openai' || config.apiType === 'litellm';
     
     console.log(`Executing LLM with model: ${model}, system prompt: ${systemPrompt}, API type: ${useOpenAI ? 'OpenAI' : 'Ollama'}`);
     
