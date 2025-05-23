@@ -149,7 +149,7 @@ const AssistantSettings: React.FC<AssistantSettingsProps> = ({
             api_type: (config.api_type as 'ollama' | 'openai' | 'litellm') || 'ollama',
             openai_api_key: config.openai_api_key,
             openai_base_url: config.openai_base_url || 'https://api.openai.com/v1',
-            litellm_base_url: config.litellm_base_url,
+            litellm_base_url: config.litellm_base_url || 'http://localhost:4000',
             n8n_base_url: config.n8n_base_url,
             n8n_api_key: config.n8n_api_key
           };
