@@ -16,7 +16,7 @@ const SynchronizedImageViewer: React.FC<SynchronizedImageViewerProps> = ({
   useEffect(() => {
     const handler = (e: Event) => {
       const ev = e as CustomEvent<{ scrollLeft: number; scrollTop: number }>;
-      if (ev.target === containerRef.current) return;
+      if (ev.target === containerRef.current) {
       if (containerRef.current) {
         containerRef.current.scrollLeft = ev.detail.scrollLeft;
         containerRef.current.scrollTop = ev.detail.scrollTop;
