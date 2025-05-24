@@ -32,7 +32,7 @@ const SynchronizedImageViewer: React.FC<SynchronizedImageViewerProps> = ({
   }, [syncGroup]);
 
 // Debounce helper used to limit scroll event frequency
-const debounce = (func: Function, wait: number) => {
+const debounce = (func: (...args: any[]) => void, wait: number) => {
   let timeout: NodeJS.Timeout;
   return (...args: any[]) => {
     clearTimeout(timeout);
