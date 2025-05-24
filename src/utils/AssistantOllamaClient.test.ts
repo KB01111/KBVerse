@@ -102,7 +102,7 @@ it('checks connection using base URL', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }));
   const client = new AssistantOllamaClient('http://test', { type: 'litellm' });
   const result = await client.checkConnection();
-  expect(fetch).toHaveBeenCalledWith('http://test/api/tags', {
+  expect(fetch).toHaveBeenCalledWith('http://test/models', {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' }
   });
