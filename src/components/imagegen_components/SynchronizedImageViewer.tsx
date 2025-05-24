@@ -75,7 +75,8 @@ const debounce = (func: Function, wait: number) => {
         className="max-w-none"
         onError={(e) => {
           console.error('Failed to load image:', imageUrl);
-          e.currentTarget.style.display = 'none';
+          e.currentTarget.alt = 'Failed to load image';
+          e.currentTarget.style.border = '1px solid red';
         }}
       />
     </div>
