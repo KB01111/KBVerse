@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 
 interface SynchronizedImageViewerProps {
   imageUrl: string;
@@ -31,19 +31,14 @@ const SynchronizedImageViewer: React.FC<SynchronizedImageViewerProps> = ({
     };
   }, [syncGroup]);
 
-// At the top of the file, add the import
-import { useCallback } from 'react';
-
-// Add this helper function outside your component
-const debounce = (func: Function, wait: number) => {
+// Debounce helper used to limit scroll event frequency
+const debounce = (func: (...args: any[]) => void, wait: number) => {
   let timeout: NodeJS.Timeout;
   return (...args: any[]) => {
     clearTimeout(timeout);
     timeout = setTimeout(() => func(...args), wait);
   };
 };
-
-// …inside your component…
 
   const handleScroll = useCallback(
     debounce(() => {
