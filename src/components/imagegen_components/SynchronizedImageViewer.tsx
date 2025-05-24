@@ -46,8 +46,19 @@ const SynchronizedImageViewer: React.FC<SynchronizedImageViewerProps> = ({
       ref={containerRef}
       onScroll={handleScroll}
       className={`overflow-auto ${className}`}
+      role="img"
+      aria-label="Synchronized image viewer"
+      tabIndex={0}
     >
-      <img src={imageUrl} alt="Generated" className="max-w-none" />
+      <img
+        src={imageUrl}
+        alt="Generated"
+        className="max-w-none"
+        onError={(e) => {
+          console.error('Failed to load image:', imageUrl);
+          e.currentTarget.style.display = 'none';
+        }}
+      />
     </div>
   );
 };
