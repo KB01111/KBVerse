@@ -111,19 +111,19 @@ function createAppMenu(mainWindow) {
         {
           label: 'Learn More',
           click: async () => {
-            await shell.openExternal('https://github.com/badboysm890/ClaraVerse');
+            await shell.openExternal('https://github.com/KB01111/KBVerse');
           }
         },
         {
           label: 'Documentation',
           click: async () => {
-            await shell.openExternal('https://github.com/badboysm890/ClaraVerse#readme');
+            await shell.openExternal('https://github.com/KB01111/KBVerse#readme');
           }
         },
         {
           label: 'Report an Issue',
           click: async () => {
-            await shell.openExternal('https://github.com/badboysm890/ClaraVerse/issues');
+            await shell.openExternal('https://github.com/KB01111/KBVerse/issues');
           }
         },
         { type: 'separator' },
