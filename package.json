@@ -165,8 +165,8 @@
     },
     "publish": {
       "provider": "github",
-      "owner": "badboysm890",
-      "repo": "ClaraVerse",
+      "owner": "KB01111",
+      "repo": "KBVerse",
       "releaseType": "release",
       "private": false
     },

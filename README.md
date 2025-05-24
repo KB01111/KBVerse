@@ -12,8 +12,8 @@
   <br/>
   <a href="https://claraverse.netlify.app/"><img src="https://img.shields.io/badge/Clara-1.2.61-FFD700.svg" alt="Clara Version Badge"></a>
   <br/><br/>
-  <a href="https://clara.badboysm890.in/" target="_blank"><strong>🌐 Try Clara Online</strong></a> • 
-  <a href="https://github.com/badboysm890/ClaraVerse/releases" target="_blank"><strong>⬇️ Download Desktop App</strong></a>
+  <a href="https://clara.badboysm890.in/" target="_blank"><strong>🌐 Try Clara Online</strong></a> •
+  <a href="https://github.com/KB01111/KBVerse/releases" target="_blank"><strong>⬇️ Download Desktop App</strong></a>
   <br/><br/>
   <a href="https://www.producthunt.com/posts/clara-433c5291-7639-4271-b246-8df30cbc449f" target="_blank">
     <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=942765&theme=light" alt="Clara on Product Hunt" width="250" height="54" />
@@ -30,10 +30,10 @@
 
 ## 🌟 Help Clara Grow
 
-If you like what I’m building:
+-If you like what I’m building:
 
-- ⭐ [Star the repo](https://github.com/badboysm890/ClaraVerse)
-- 🐦 [Tweet about Clara](https://twitter.com/intent/tweet?text=Clara%20is%20a%20fully%20offline%20AI%20superstack%20with%20LLMs%2C%20automations%2C%20agents%2C%20image%20generation%20%2B%20more%20%E2%80%94%20all%20open-source.%20Get%20it%20here%20%F0%9F%91%87&url=https%3A%2F%2Fgithub.com%2Fbadboysm890%2FClaraVerse)
+- ⭐ [Star the repo](https://github.com/KB01111/KBVerse)
+- 🐦 [Tweet about Clara](https://twitter.com/intent/tweet?text=Clara%20is%20a%20fully%20offline%20AI%20superstack%20with%20LLMs%2C%20automations%2C%20agents%2C%20image%20generation%20%2B%20more%20%E2%80%94%20all%20open-source.%20Get%20it%20here%20%F0%9F%91%87&url=https%3A%2F%2Fgithub.com%2FKB01111%2FKBVerse)
 - 💬 Post workflows, bugs, memes, or PRs — I respond to all
 
 ---
@@ -143,9 +143,9 @@ Organize your generations with tags, thumbnails, and metadata.
 
 ## 💻 Download Desktop App
 
-* 🪟 [Windows (.exe)](https://github.com/badboysm890/ClaraVerse/releases)
-* 🍎 [macOS (.dmg)](https://github.com/badboysm890/ClaraVerse/releases)
-* 🐧 [Linux (.AppImage)](https://github.com/badboysm890/ClaraVerse/releases)
+* 🪟 [Windows (.exe)](https://github.com/KB01111/KBVerse/releases)
+* 🍎 [macOS (.dmg)](https://github.com/KB01111/KBVerse/releases)
+* 🐧 [Linux (.AppImage)](https://github.com/KB01111/KBVerse/releases)
 
 ---
 
@@ -165,8 +165,8 @@ Totally safe. It’s unsigned, not unsafe.
 ## 👨‍💻 Dev Setup
 
 ```bash
-git clone https://github.com/badboysm890/ClaraVerse.git
-cd ClaraVerse
+git clone https://github.com/KB01111/KBVerse.git
+cd KBVerse
 npm install
 npm run dev           # For web
 npm run electron:dev  # For desktop
@@ -191,14 +191,14 @@ LiteLLM endpoint runs elsewhere.
 
 ## 📈 GitHub Star Growth
 
-[![Star History](https://api.star-history.com/svg?repos=badboysm890/ClaraVerse&type=Date)](https://www.star-history.com/#badboysm890/ClaraVerse&Date)
+[![Star History](https://api.star-history.com/svg?repos=KB01111/KBVerse&type=Date)](https://www.star-history.com/#KB01111/KBVerse&Date)
 
 ---
 
 ## 💬 Support / Feedback / Memes
 
 📧 **[praveensm890@gmail.com](mailto:praveensm890@gmail.com)**  
-🐙 [Raise issues or PRs on GitHub](https://github.com/badboysm890/ClaraVerse)  
+🐙 [Raise issues or PRs on GitHub](https://github.com/KB01111/KBVerse)
 🔥 Got memes? Post them. I’ll probably feature them.
 
 ---
