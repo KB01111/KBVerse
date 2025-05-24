@@ -29,17 +29,34 @@ const SynchronizedImageViewer: React.FC<SynchronizedImageViewerProps> = ({
     };
   }, [syncGroup]);
 
-  const handleScroll = () => {
-    if (containerRef.current) {
-      const event = new CustomEvent(`sync-scroll-${syncGroup}`, {
-        detail: {
-          scrollLeft: containerRef.current.scrollLeft,
-          scrollTop: containerRef.current.scrollTop
-        }
-      });
-      window.dispatchEvent(event);
-    }
+// At the top of the file, add the import
+import { useCallback } from 'react';
+
+// Add this helper function outside your component
+const debounce = (func: Function, wait: number) => {
+  let timeout: NodeJS.Timeout;
+  return (...args: any[]) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), wait);
   };
+};
+
+// …inside your component…
+
+  const handleScroll = useCallback(
+    debounce(() => {
+      if (containerRef.current) {
+        const event = new CustomEvent(`sync-scroll-${syncGroup}`, {
+          detail: {
+            scrollLeft: containerRef.current.scrollLeft,
+            scrollTop: containerRef.current.scrollTop,
+          },
+        });
+        window.dispatchEvent(event);
+      }
+    }, 16), // ~60fps
+    [syncGroup]
+  );
 
   return (
     <div
